@@ -7,7 +7,7 @@ import { ConfigModel } from '@Models/models';
 
 @Service()
 export class ConfigRepository {
-  constructor(@Logger(module) private logger: winston.Logger) {}
+  constructor(@Logger(module) private logger: winston.Logger) { }
 
   async get(key: string) {
     return ConfigModel.findOne({ key });

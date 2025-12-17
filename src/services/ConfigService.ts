@@ -1,4 +1,4 @@
-import  Redis  from 'ioredis';
+import Redis from 'ioredis';
 import { Inject, Service } from 'typedi';
 import winston from 'winston';
 
@@ -16,7 +16,7 @@ export class ConfigService {
     @Logger(module) private readonly logger: winston.Logger,
     @Inject('cache') private readonly cache: Redis.Redis,
     private readonly configRepo: ConfigRepository,
-  ) {}
+  ) { }
 
   /**
    * get the config as a string

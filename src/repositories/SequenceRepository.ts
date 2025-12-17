@@ -8,7 +8,7 @@ import { SequenceModel } from '@Models/models';
 
 @Service()
 export class SequenceRepository {
-  constructor(@Logger(module) private logger: winston.Logger) {}
+  constructor(@Logger(module) private logger: winston.Logger) { }
 
   async increment(key: string, session?: mongoose.ClientSession) {
     return SequenceModel.findOneAndUpdate(

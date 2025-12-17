@@ -20,7 +20,7 @@ export class JobsDemoController {
   constructor(
     @Logger(module) private readonly logger: winston.Logger,
     private readonly exampleJob: ExampleQueueWorkerJob,
-  ) {}
+  ) { }
 
   @Post('/dispatch')
   public async dispatch(@Body() body: DispatchJobBody) {

@@ -8,7 +8,7 @@ import { UserRepository } from '@Repositories/UserRepository';
 export class DemoService {
   constructor(
     private readonly userRepo: UserRepository,
-  ){}
+  ) { }
 
   async findByIds(ids: string[]) {
     return [{

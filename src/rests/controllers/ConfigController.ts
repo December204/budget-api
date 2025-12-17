@@ -26,7 +26,7 @@ export class ConfigController {
   constructor(
     @Logger(module) private readonly logger: winston.Logger,
     private configService: ConfigService,
-  ) {}
+  ) { }
 
   @Authorized(RestRoles.ADMIN)
   @Post('/expire')

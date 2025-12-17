@@ -21,7 +21,7 @@ export class KafkaDemoController {
   constructor(
     @Logger(module) private readonly logger: winston.Logger,
     @Inject('kafkaProducer') private readonly producer: Producer,
-  ) {}
+  ) { }
 
   @Post('/produce')
   public async produce(@Body() body: ProduceDemoMessageBody) {
