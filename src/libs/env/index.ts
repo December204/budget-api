@@ -79,6 +79,10 @@ export const env = {
   jwt: {
     publicKey: getOsEnvOptional('JWT_PUBLIC_KEY'),
     privateKey: getOsEnvOptional('JWT_PRIVATE_KEY'),
+    secret: getOsEnvOptional('JWT_SECRET') || 'change-me-in-production',
+    refreshSecret: getOsEnvOptional('JWT_REFRESH_SECRET') || 'change-me-refresh-in-production',
+    accessExpiresIn: '15m',
+    refreshExpiresInMs: 7 * 24 * 60 * 60 * 1000,
   },
   graphqlJwt: {
     publicKey: getOsEnvOptional('GRAPHQL_JWT_PUBLIC_KEY'),
