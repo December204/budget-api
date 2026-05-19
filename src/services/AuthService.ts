@@ -1,11 +1,14 @@
+import crypto from 'crypto';
+
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import { Service } from 'typedi';
 
-import { prisma } from '../lib/prisma';
 import { env } from '@Libs/env';
+
 import { RegisterDto, LoginDto } from '@Rests/validations/AuthValidation';
+
+import { prisma } from '../lib/prisma';
 
 const BCRYPT_ROUNDS = 10;
 

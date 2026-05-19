@@ -4,6 +4,7 @@ import { Service } from 'typedi';
 import rateLimit from 'express-rate-limit';
 
 import { AuthService } from '@Services/AuthService';
+
 import {
   RegisterSchema,
   LoginSchema,

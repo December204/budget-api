@@ -29,7 +29,10 @@
     "migrate-init": "migrate-mongo init",
     "migrate-add": "migrate-mongo create",
     "migrate-up": "dotenv migrate-mongo up",
-    "migrate-down": "dotenv migrate-mongo down"
+    "migrate-down": "dotenv migrate-mongo down",
+    "migration:generate": "dotenv -- ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/databases/postgres/data-source.ts",
+    "migration:run": "dotenv -- ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/databases/postgres/data-source.ts",
+    "migration:revert": "dotenv -- ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/databases/postgres/data-source.ts"
   },
   "dependencies": {
     "@elastic/ecs-winston-format": "^1.5.3",
