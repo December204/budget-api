@@ -6,15 +6,47 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum NotificationType {
+  BUDGET_ALERT
+  RECURRING_REMINDER
+  SYSTEM
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
 model User {
-  id            String         @id @default(cuid())
-  email         String         @unique
-  passwordHash  String
-  name          String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  deletedAt     DateTime?
-  refreshTokens RefreshToken[]
+  id                    String                 @id @default(cuid())
+  email                 String                 @unique
+  passwordHash          String
+  name                  String?
+  avatarUrl             String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+  refreshTokens         RefreshToken[]
+  categories            Category[]
+  transactions          Transaction[]
+  budgetLimits          BudgetLimit[]
+  recurringTransactions RecurringTransaction[]
+  notifications         Notification[]
 
   @@map("users")
 }
@@ -27,5 +59,116 @@ model RefreshToken {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("refresh_tokens")
+}
+
+model Category {
+  id                    String                 @id @default(cuid())
+  userId                String
+  name                  String
+  type                  TransactionType
+  color                 String                 @default("#6B7280")
+  icon                  String?
+  isDefault             Boolean                @default(false)
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  deletedAt             DateTime?
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions          Transaction[]
+  budgetLimits          BudgetLimit[]
+  recurringTransactions RecurringTransaction[]
+
+  @@index([userId])
+  @@index([userId, type])
+  @@map("categories")
+}
+
+model Transaction {
+  id                     String                @id @default(cuid())
+  userId                 String
+  categoryId             String
+  /// Amount in VND (integer, always positive)
+  amount                 Int
+  type                   TransactionType
+  date                   DateTime
+  note                   String?
+  attachmentUrl          String?
+  recurringTransactionId String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+  deletedAt              DateTime?
+  user                   User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category               Category              @relation(fields: [categoryId], references: [id])
+  recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id])
+
+  @@index([userId])
+  @@index([userId, date])
+  @@index([userId, type])
+  @@index([categoryId])
+  @@index([date])
+  @@map("transactions")
+}
+
+model BudgetLimit {
+  id         String   @id @default(cuid())
+  userId     String
+  categoryId String
+  /// Monthly budget cap in VND (integer)
+  amount     Int
+  month      Int
+  year       Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId, month, year])
+  @@index([userId, year, month])
+  @@map("budget_limits")
+}
+
+model RecurringTransaction {
+  id           String             @id @default(cuid())
+  userId       String
+  categoryId   String
+  /// Amount in VND (integer, always positive)
+  amount       Int
+  type         TransactionType
+  frequency    RecurringFrequency
+  /// Day of month (1–31), used for MONTHLY and YEARLY frequencies
+  dayOfMonth   Int?
+  /// Day of week (0 = Sunday … 6 = Saturday), used for WEEKLY frequency
+  dayOfWeek    Int?
+  startDate    DateTime
+  endDate      DateTime?
+  note         String?
+  isActive     Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category     Category           @relation(fields: [categoryId], references: [id])
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("recurring_transactions")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  /// Arbitrary JSON payload (e.g. { categoryId, budgetLimitId })
+  data      Json?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@map("notifications")
 }
