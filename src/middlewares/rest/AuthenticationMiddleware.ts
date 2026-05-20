@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { ExpressMiddlewareInterface, Middleware, UnauthorizedError } from 'routing-controllers';
 import winston from 'winston';
@@ -22,12 +23,16 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
     }
     const [, token] = (req.headers.authorization || '').split(' ');
     if (!token) return next();
-    // logger.info('AuthenticationMiddleware:: Token in request: ', token);
     try {
-      const data: any = verify(token, env.jwt.publicKey);
-      // logger.info('AuthenticationMiddleware:: Decoded token data: ', data);
+      let data: any;
+      if (env.jwt.publicKey) {
+        data = verify(token, env.jwt.publicKey);
+      } else {
+        data = jwt.verify(token, env.jwt.secret, { algorithms: ['HS256'] });
+      }
       (req as any).identity = data.sub;
       (req as any).roles = data['roles'] || [];
+      (req as any).currentUser = { id: parseInt(data.sub, 10), email: data.email };
       return next();
     } catch (error) {
       logger.error('AuthenticationMiddleware:: Error verifying token: ', error);

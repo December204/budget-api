@@ -1,16 +1,26 @@
-import { Field, Int, ObjectType } from 'type-graphql';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity({
-  name: 'user',
-})
-@ObjectType()
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
-  @Field(of => Int)
   id: number;
 
+  @Column({ unique: true })
+  @Index()
+  email: string;
+
   @Column()
-  @Field()
   name: string;
+
+  @Column({ select: false })
+  passwordHash: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 }

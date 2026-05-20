@@ -17,7 +17,7 @@ export class Kernel {
     CacheProvider,
     // KafkaProvider,
     // JobsProvider,
-    // TypeORMProvider,
+    TypeORMProvider,
     HttpProvider,
     // GraphqlProvider,
     // MongodbProvider,
