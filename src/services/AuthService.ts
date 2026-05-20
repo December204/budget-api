@@ -27,18 +27,24 @@ export class AuthService {
     private refreshTokenRepo: RefreshTokenRepository,
   ) {}
 
-  async register(email: string, password: string, name?: string): Promise<TokenPair> {
-    const existing = await this.userRepo.findByEmail(email);
-    if (existing) {
+  async register(email: string, username: string, password: string, name?: string): Promise<TokenPair> {
+    const [existingEmail, existingUsername] = await Promise.all([
+      this.userRepo.findByEmail(email),
+      this.userRepo.findByUsername(username),
+    ]);
+    if (existingEmail) {
       throw Object.assign(new Error('Email already registered'), { httpCode: 409, name: 'ConflictError' });
     }
+    if (existingUsername) {
+      throw Object.assign(new Error('Username already taken'), { httpCode: 409, name: 'ConflictError' });
+    }
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
-    const user = await this.userRepo.create({ email, name: name || email.split('@')[0], passwordHash });
+    const user = await this.userRepo.create({ email, username, name: name || username, passwordHash });
     return this.issueTokenPair(user.id, user.email);
   }
 
-  async login(email: string, password: string): Promise<TokenPair> {
-    const user = await this.userRepo.findByEmailWithPassword(email);
+  async login(username: string, password: string): Promise<TokenPair> {
+    const user = await this.userRepo.findByUsernameWithPassword(username);
     if (!user) {
       throw Object.assign(new Error('Invalid credentials'), { httpCode: 401, name: 'UnauthorizedError' });
     }

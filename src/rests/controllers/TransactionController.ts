@@ -1,14 +1,16 @@
-import { Authorized, Body, CurrentUser, Delete, Get, JsonController, Param, Patch, Post, QueryParams } from 'routing-controllers';
+import { Authorized, Body, CurrentUser, Delete, Get, JsonController, Param, Patch, Post, Req } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
+import { Request } from 'express';
 import { Service } from 'typedi';
+
+import { ValidationError } from '@Errors/ValidationError';
 
 import { TransactionService } from '@Services/TransactionService';
 
-import { CreateTransactionSchema, TransactionQuerySchema, UpdateTransactionSchema } from '@Rests/validations/TransactionValidation';
+import { TransactionQuerySchema } from '@Rests/validations/TransactionValidation';
+import { CreateTransactionDto, UpdateTransactionDto } from '@Rests/types/TransactionDto';
 import { buildPagedResponse, buildResponse } from '@Rests/types/Response';
 import { ICurrentUser } from '@Rests/types/CurrentUser';
-
-import { ValidationError } from '@Errors/ValidationError';
 
 @Service()
 @JsonController('/transactions')
@@ -18,8 +20,8 @@ export class TransactionController {
   constructor(private txService: TransactionService) {}
 
   @Get('/')
-  async list(@CurrentUser() cu: ICurrentUser, @QueryParams() query: unknown) {
-    const result = TransactionQuerySchema.safeParse(query);
+  async list(@CurrentUser() cu: ICurrentUser, @Req() req: Request) {
+    const result = TransactionQuerySchema.safeParse(req.query);
     if (!result.success) throw new ValidationError(result.error.issues);
     const { items, total } = await this.txService.list(cu.id, result.data);
     return buildPagedResponse(items, { total, page: result.data.page, limit: result.data.limit });
@@ -32,18 +34,14 @@ export class TransactionController {
   }
 
   @Post('/')
-  async create(@CurrentUser() cu: ICurrentUser, @Body() body: unknown) {
-    const result = CreateTransactionSchema.safeParse(body);
-    if (!result.success) throw new ValidationError(result.error.issues);
-    const tx = await this.txService.create(cu.id, result.data);
+  async create(@CurrentUser() cu: ICurrentUser, @Body() body: CreateTransactionDto) {
+    const tx = await this.txService.create(cu.id, body);
     return buildResponse(tx);
   }
 
   @Patch('/:id')
-  async update(@CurrentUser() cu: ICurrentUser, @Param('id') id: number, @Body() body: unknown) {
-    const result = UpdateTransactionSchema.safeParse(body);
-    if (!result.success) throw new ValidationError(result.error.issues);
-    const tx = await this.txService.update(cu.id, id, result.data);
+  async update(@CurrentUser() cu: ICurrentUser, @Param('id') id: number, @Body() body: UpdateTransactionDto) {
+    const tx = await this.txService.update(cu.id, id, body);
     return buildResponse(tx);
   }
 

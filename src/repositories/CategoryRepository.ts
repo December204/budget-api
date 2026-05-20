@@ -4,8 +4,9 @@ import winston from 'winston';
 
 import { Logger } from '@Decorators/Logger';
 
-import { Category } from '@Entities/Category';
 import { CategoryType } from '@Enums/CategoryType';
+
+import { Category } from '@Entities/Category';
 
 import { BaseOrmRepository } from '@Repositories/BaseOrmRepository';
 

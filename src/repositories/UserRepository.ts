@@ -33,6 +33,18 @@ export class UserRepository extends BaseOrmRepository<User> {
       .getOne();
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    return this.repo.findOne({ where: { username, deletedAt: null } });
+  }
+
+  async findByUsernameWithPassword(username: string): Promise<User | null> {
+    return this.repo
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.username = :username AND user.deletedAt IS NULL', { username })
+      .getOne();
+  }
+
   async create(data: DeepPartial<User>): Promise<User> {
     const user = this.repo.create(data);
     return this.repo.save(user);

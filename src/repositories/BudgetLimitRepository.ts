@@ -25,7 +25,8 @@ export class BudgetLimitRepository extends BaseOrmRepository<BudgetLimit> {
       .getMany();
   }
 
-  async findByUserCategoryMonth(userId: number, categoryId: number, month: number, year: number): Promise<BudgetLimit | null> {
+  async findByUserCategoryMonth(userId: number, categoryId: number, month: number, year: number):
+  Promise<BudgetLimit | null> {
     return this.repo.findOne({ where: { userId, categoryId, month, year, deletedAt: null } });
   }
 

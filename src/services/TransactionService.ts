@@ -3,8 +3,9 @@ import winston from 'winston';
 
 import { Logger } from '@Decorators/Logger';
 
-import { Transaction } from '@Entities/Transaction';
 import { TransactionType } from '@Enums/TransactionType';
+
+import { Transaction } from '@Entities/Transaction';
 
 import { TransactionListOptions, TransactionRepository } from '@Repositories/TransactionRepository';
 

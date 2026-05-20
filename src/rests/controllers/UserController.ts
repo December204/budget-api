@@ -4,11 +4,9 @@ import { Service } from 'typedi';
 
 import { UserService } from '@Services/UserService';
 
-import { UpdateUserSchema } from '@Rests/validations/UserValidation';
+import { UpdateUserDto } from '@Rests/types/UserDto';
 import { buildResponse } from '@Rests/types/Response';
 import { ICurrentUser } from '@Rests/types/CurrentUser';
-
-import { ValidationError } from '@Errors/ValidationError';
 
 @Service()
 @JsonController('/users')
@@ -25,10 +23,8 @@ export class UserController {
 
   @Authorized()
   @Patch('/me')
-  async updateMe(@CurrentUser() cu: ICurrentUser, @Body() body: unknown) {
-    const result = UpdateUserSchema.safeParse(body);
-    if (!result.success) throw new ValidationError(result.error.issues);
-    const user = await this.userService.updateMe(cu.id, result.data);
+  async updateMe(@CurrentUser() cu: ICurrentUser, @Body() body: UpdateUserDto) {
+    const user = await this.userService.updateMe(cu.id, body);
     return buildResponse(user);
   }
 }

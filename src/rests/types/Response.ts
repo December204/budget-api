@@ -4,7 +4,8 @@ export interface PagedMeta {
   limit: number;
 }
 
-export function buildResponse<T>(data: T, meta: Record<string, unknown> = {}): { data: T; meta: Record<string, unknown> } {
+export function buildResponse<T>(data: T, meta: Record<string, unknown> = {}):
+{ data: T; meta: Record<string, unknown> } {
   return { data, meta };
 }
 
