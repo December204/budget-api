@@ -102,6 +102,9 @@ export default class HttpProvider extends ServiceProvider {
         }
         return true;
       },
+      currentUserChecker: async (action) => {
+        return (action.request as any).currentUser;
+      },
     });
     swaggerSetup(this.expressApp);
     if (ServerType.allowProducerServer()) {

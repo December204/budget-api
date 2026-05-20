@@ -1,5 +1,5 @@
 import { Inject, Service } from 'typedi';
-import { DataSource, DeepPartial, EntityRepository, Repository } from 'typeorm';
+import { DataSource, DeepPartial } from 'typeorm';
 import winston from 'winston';
 
 import { Logger } from '@Decorators/Logger';
@@ -17,7 +17,29 @@ export class UserRepository extends BaseOrmRepository<User> {
     super(dataSource, User);
   }
 
-  async create(user: DeepPartial<User>) {
+  async findById(id: number): Promise<User | null> {
+    return this.repo.findOne({ where: { id, deletedAt: null } });
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repo.findOne({ where: { email, deletedAt: null } });
+  }
+
+  async findByEmailWithPassword(email: string): Promise<User | null> {
+    return this.repo
+      .createQueryBuilder('user')
+      .addSelect('user.passwordHash')
+      .where('user.email = :email AND user.deletedAt IS NULL', { email })
+      .getOne();
+  }
+
+  async create(data: DeepPartial<User>): Promise<User> {
+    const user = this.repo.create(data);
     return this.repo.save(user);
+  }
+
+  async updateById(id: number, data: DeepPartial<User>): Promise<User | null> {
+    await this.repo.update({ id }, data);
+    return this.findById(id);
   }
 }
